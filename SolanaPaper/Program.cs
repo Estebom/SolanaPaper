@@ -1,8 +1,14 @@
+using SolanaPaper.Data.Models;
+using SolanaPaper.Data.Services;
+
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using SolanaPaper.Data;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.Configure<MongoDBSettings>(builder.Configuration.GetSection("MongoDB"));
+builder.Services.AddSingleton<MongoDBService>();
 
 // Add services to the container.
 builder.Services.AddRazorPages();
