@@ -10,6 +10,8 @@ namespace SolanaPaper.Data.Models
         [BsonRepresentation(BsonType.ObjectId)]
         public string? Id { get; set; }
 
+        [BsonElement("_user")]
+        public string? username { get; set; } = null!;
 
 
     }
