@@ -14,12 +14,20 @@ namespace SolanaPaper.Data.Models
         [JsonPropertyName("_ca")]
         public string ContactAddress { get; set; } = null!;
 
+        [BsonElement("price")]
+        [JsonPropertyName("price")]
+        public double Price { get; set; }
+
+        [BsonElement("marketCap")]
+        [JsonPropertyName("marketCap")]
+        public double MarketCap { get; set; }
+
+        [BsonElement("supply")]
+        [JsonPropertyName("supply")]
+        public double CurrentSupply { get; set; }
+
         [BsonElement("timestamp")]
         [JsonPropertyName("timestamp")]
         public DateTime Timestamp { get; set; }
-
-        [BsonElement("marketPrice")]
-        [JsonPropertyName("marketPrice")]
-        public double MarketPrice { get; set; }
     }
 }
