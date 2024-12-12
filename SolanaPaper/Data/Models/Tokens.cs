@@ -16,7 +16,7 @@ namespace SolanaPaper.Data.Models
 
         [BsonElement("holders")]
         [JsonPropertyName("holders")]
-        public Holder[] Holders { get; set; } = null!;
+        public List<Holder> Holders { get; set; } = null!;
 
         [BsonElement("socials")]
         [JsonPropertyName("socials")]
