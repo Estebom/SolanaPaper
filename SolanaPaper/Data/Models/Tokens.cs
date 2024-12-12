@@ -14,6 +14,10 @@ namespace SolanaPaper.Data.Models
         [JsonPropertyName("_ca")]
         public string ContactAddress { get; set; } = null!;
 
+        [BsonElement("symbol")]
+        [JsonPropertyName("symbol")]
+        public string Symbol { get; set; } = null!;
+
         [BsonElement("mintAuthority")]
         [JsonPropertyName("mintAuthority")]
         public string MintAuthority { get; set; } = null!;

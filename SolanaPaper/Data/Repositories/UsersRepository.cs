@@ -50,7 +50,40 @@ namespace SolanaPaper.Data.Services
         public async Task AddToHoldings(string user, string holding) 
         {
             FilterDefinition<Users> filter = Builders<Users>.Filter.Eq("_user", user);
-           UpdateDefinition<Users> update = Builders<Users>.Update.Push("holdings", holding);
+            UpdateDefinition<Users> update = Builders<Users>.Update.AddToSet<string>("holdings", holding);
+            await _usersCollection.UpdateOneAsync(filter, update);
+            return;
+        }
+
+        public async Task AddToHoldings(string user, List<string> holding)
+        {
+            FilterDefinition<Users> filter = Builders<Users>.Filter.Eq("_user", user);
+            UpdateDefinition<Users> update = Builders<Users>.Update.AddToSet<List<string>>("holdings", holding);
+            await _usersCollection.UpdateOneAsync(filter, update);
+            return;
+        }
+
+        public async Task RemoveFromHoldings(string user, string holding)
+        {
+            FilterDefinition<Users> filter = Builders<Users>.Filter.Eq("_user", user);
+            UpdateDefinition<Users> update = Builders<Users>.Update.Pull<string>("holdings", holding);
+            await _usersCollection.UpdateOneAsync(filter, update);
+            return;
+        }
+
+        public async Task RemoveFromHoldings(string user, List<string> holding)
+        {
+            FilterDefinition<Users> filter = Builders<Users>.Filter.Eq("_user", user);
+            UpdateDefinition<Users> update = Builders<Users>.Update.Pull<List<string>>("holdings", holding);
+            await _usersCollection.UpdateOneAsync(filter, update);
+            return;
+        }
+
+        public async Task Delete(string username)
+        {
+            FilterDefinition<Users> filter = Builders<Users>.Filter.Eq("_user", username);
+            await _usersCollection.DeleteOneAsync(filter);
+            return;
         }
     }
 }
