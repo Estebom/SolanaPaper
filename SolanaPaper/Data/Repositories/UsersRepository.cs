@@ -2,8 +2,9 @@
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 using MongoDB.Bson;
+using System.Runtime.CompilerServices;
 
-namespace SolanaPaper.Data.Services
+namespace SolanaPaper.Data.Repositories
 {
     public class UsersRepository
     {
@@ -16,74 +17,154 @@ namespace SolanaPaper.Data.Services
             _usersCollection = database.GetCollection<Users>(mongoDBSettings.Value.CollectionName1);
         }
 
-        public async Task<List<Users>> Get() 
+        public async Task<List<Users>> Get()
         {
-            return await _usersCollection.Find(new BsonDocument()).ToListAsync();
+            try
+            {
+                return await _usersCollection.Find(new BsonDocument()).ToListAsync();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
         }
 
         public async Task<Users> GetByUsername(string username) 
         {
-            FilterDefinition<Users> filter = Builders<Users>.Filter.Eq("_user", username);
-            return await _usersCollection.Find(filter).FirstOrDefaultAsync();
+            try
+            {
+                FilterDefinition<Users> filter = Builders<Users>.Filter.Eq("_user", username);
+                return await _usersCollection.Find(filter).FirstOrDefaultAsync();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
         }
 
-        public async Task<List<Users>> GetByEmail(string email) 
+        public async Task<Users> GetByEmail(string email)
         {
-            FilterDefinition<Users> filter = Builders<Users>.Filter.Eq("email", email);
-            return await _usersCollection.Find(filter).ToListAsync();
+            try
+            {
+                FilterDefinition<Users> filter = Builders<Users>.Filter.Eq("email", email);
+                return await _usersCollection.Find(filter).FirstOrDefaultAsync();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
         }
 
         public async Task Create(Users user) 
         {
-            await _usersCollection.InsertOneAsync(user);
-            return;
+            try
+            {
+                await _usersCollection.InsertOneAsync(user);
+                return;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
         }
 
         public async Task UpdateStats(string username, Stats stats)
         {
-            FilterDefinition<Users> filter = Builders<Users>.Filter.Eq("_user", username);
-            UpdateDefinition<Users> update = Builders<Users>.Update.Set("stats", stats);
-            await _usersCollection.UpdateOneAsync(filter, update);
-            return;
+            try
+            {
+                FilterDefinition<Users> filter = Builders<Users>.Filter.Eq("_user", username);
+                UpdateDefinition<Users> update = Builders<Users>.Update.Set("stats", stats);
+                await _usersCollection.UpdateOneAsync(filter, update);
+                return;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
         }
 
-        public async Task AddToHoldings(string user, string holding) 
+        public async Task AddToHoldings(string user, string holding)
         {
-            FilterDefinition<Users> filter = Builders<Users>.Filter.Eq("_user", user);
-            UpdateDefinition<Users> update = Builders<Users>.Update.AddToSet<string>("holdings", holding);
-            await _usersCollection.UpdateOneAsync(filter, update);
-            return;
+            try
+            {
+                FilterDefinition<Users> filter = Builders<Users>.Filter.Eq("_user", user);
+                UpdateDefinition<Users> update = Builders<Users>.Update.AddToSet("holdings", holding);
+                await _usersCollection.UpdateOneAsync(filter, update);
+                return;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
         }
 
-        public async Task AddToHoldings(string user, List<string> holding)
+        //TODO FIX THHIS
+        public async Task AddToHoldings(string user, List<string> holdings)
         {
-            FilterDefinition<Users> filter = Builders<Users>.Filter.Eq("_user", user);
-            UpdateDefinition<Users> update = Builders<Users>.Update.AddToSet<List<string>>("holdings", holding);
-            await _usersCollection.UpdateOneAsync(filter, update);
-            return;
+            try
+            {
+                FilterDefinition<Users> filter = Builders<Users>.Filter.Eq("_user", user);
+                UpdateDefinition<Users> update = Builders<Users>.Update.AddToSetEach("holdings", holdings);
+                await _usersCollection.UpdateOneAsync(filter, update);
+                return;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
         }
 
         public async Task RemoveFromHoldings(string user, string holding)
         {
-            FilterDefinition<Users> filter = Builders<Users>.Filter.Eq("_user", user);
-            UpdateDefinition<Users> update = Builders<Users>.Update.Pull<string>("holdings", holding);
-            await _usersCollection.UpdateOneAsync(filter, update);
-            return;
+            try
+            {
+                FilterDefinition<Users> filter = Builders<Users>.Filter.Eq("_user", user);
+                UpdateDefinition<Users> update = Builders<Users>.Update.Pull<string>("holdings", holding);
+                await _usersCollection.UpdateOneAsync(filter, update);
+                return;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
         }
 
-        public async Task RemoveFromHoldings(string user, List<string> holding)
+        public async Task RemoveFromHoldings(string user, List<string> holdings)
         {
-            FilterDefinition<Users> filter = Builders<Users>.Filter.Eq("_user", user);
-            UpdateDefinition<Users> update = Builders<Users>.Update.Pull<List<string>>("holdings", holding);
-            await _usersCollection.UpdateOneAsync(filter, update);
-            return;
+            try
+            {
+                FilterDefinition<Users> filter = Builders<Users>.Filter.Eq("_user", user);
+                UpdateDefinition<Users> update = Builders<Users>.Update.PullAll("holdings", holdings);
+                await _usersCollection.UpdateOneAsync(filter, update);
+                return;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
         }
-
         public async Task Delete(string username)
         {
-            FilterDefinition<Users> filter = Builders<Users>.Filter.Eq("_user", username);
-            await _usersCollection.DeleteOneAsync(filter);
-            return;
+            try
+            {
+                FilterDefinition<Users> filter = Builders<Users>.Filter.Eq("_user", username);
+                await _usersCollection.DeleteOneAsync(filter);
+                return;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
         }
     }
 }

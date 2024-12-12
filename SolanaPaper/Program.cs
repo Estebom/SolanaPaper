@@ -1,5 +1,5 @@
 using SolanaPaper.Data.Models;
-using SolanaPaper.Data.Services;
+using SolanaPaper.Data.Repositories;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using SolanaPaper.Data;

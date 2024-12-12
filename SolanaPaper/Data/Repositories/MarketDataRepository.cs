@@ -5,7 +5,7 @@ using MongoDB.Driver;
 using MongoDB.Bson;
 using System.Security.Cryptography.X509Certificates;
 
-namespace SolanaPaper.Data.Services
+namespace SolanaPaper.Data.Repositories
 {
     public class MarketDataRepository
     {
@@ -20,41 +20,89 @@ namespace SolanaPaper.Data.Services
 
         public async Task<List<MarketData>> GetByContactAddress(string contractAddress)
         {
-            FilterDefinition<MarketData> filter = Builders<MarketData>.Filter.Eq("_ca", contractAddress);
-            return await _marketDataCollection.Find(filter).ToListAsync();
+            try
+            {
+                FilterDefinition<MarketData> filter = Builders<MarketData>.Filter.Eq("_ca", contractAddress);
+                return await _marketDataCollection.Find(filter).ToListAsync();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
         }
 
         public async Task Create(MarketData marketData)
         {
-            await _marketDataCollection.InsertOneAsync(marketData);
-            return;
+            try
+            {
+                await _marketDataCollection.InsertOneAsync(marketData);
+                return;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
         }
 
         public async Task Create(List<MarketData> marketData)
         {
-            await _marketDataCollection.InsertManyAsync(marketData);
-            return;
+            try
+            {
+                await _marketDataCollection.InsertManyAsync(marketData);
+                return;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
         }
 
         public async Task Update(string contactAddress, MarketData marketData)
         {
-            FilterDefinition<MarketData> filter = Builders<MarketData>.Filter.Eq("_ca", contactAddress);
-            await _marketDataCollection.ReplaceOneAsync(filter, marketData);
-            return;
+            try
+            {
+                FilterDefinition<MarketData> filter = Builders<MarketData>.Filter.Eq("_ca", contactAddress);
+                await _marketDataCollection.ReplaceOneAsync(filter, marketData);
+                return;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
         }
 
         public async Task Delete(string contactAddress)
         {
-            FilterDefinition<MarketData> filter = Builders<MarketData>.Filter.Eq("_ca", contactAddress);
-            await _marketDataCollection.DeleteOneAsync(filter);
-            return;
+            try
+            {
+                FilterDefinition<MarketData> filter = Builders<MarketData>.Filter.Eq("_ca", contactAddress);
+                await _marketDataCollection.DeleteOneAsync(filter);
+                return;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
         }
 
         public async Task Delete(List<string> contactAddresses)
         {
-            FilterDefinition<MarketData> filter = Builders<MarketData>.Filter.In("_ca", contactAddresses);
-            await _marketDataCollection.DeleteManyAsync(filter);
-            return;
+            try
+            {
+                FilterDefinition<MarketData> filter = Builders<MarketData>.Filter.In("_ca", contactAddresses);
+                await _marketDataCollection.DeleteManyAsync(filter);
+                return;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
         }
     }
 }

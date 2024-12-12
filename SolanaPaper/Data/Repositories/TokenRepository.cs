@@ -3,7 +3,7 @@ using SolanaPaper.Data.Models;
 using MongoDB.Driver;
 using MongoDB.Bson;
 
-namespace SolanaPaper.Data.Services
+namespace SolanaPaper.Data.Repositories
 {
     public class TokenRepository
     {
@@ -18,73 +18,154 @@ namespace SolanaPaper.Data.Services
 
         public async Task<List<Tokens>> Get()
         {
-            return await _tokensCollection.Find(new BsonDocument()).ToListAsync();
+            try
+            {
+                return await _tokensCollection.Find(new BsonDocument()).ToListAsync();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
         }
 
         public async Task<Tokens> GetByContactAddress(string contactAddress)
         {
-            FilterDefinition<Tokens> filter = Builders<Tokens>.Filter.Eq("_ca", contactAddress);
-            return await _tokensCollection.Find(filter).FirstOrDefaultAsync();
+            try
+            {
+                FilterDefinition<Tokens> filter = Builders<Tokens>.Filter.Eq("_ca", contactAddress);
+                return await _tokensCollection.Find(filter).FirstOrDefaultAsync();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
         }
 
         public async Task<List<Tokens>> GetBySymbol(string symbol)
         {
-            FilterDefinition<Tokens> filter = Builders<Tokens>.Filter.In("symbol", symbol);
-            return await _tokensCollection.Find(filter).ToListAsync();
+            try
+            {
+                FilterDefinition<Tokens> filter = Builders<Tokens>.Filter.In("symbol", symbol);
+                return await _tokensCollection.Find(filter).ToListAsync();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
         }
 
         public async Task Create(Tokens token)
         {
-            await _tokensCollection.InsertOneAsync(token);
-            return;
+            try
+            {
+                await _tokensCollection.InsertOneAsync(token);
+                return;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
         }
 
         public async Task UpdateMintAuthority(string contactAddress, string mintAuthority)
         {
-            FilterDefinition<Tokens> filter = Builders<Tokens>.Filter.Eq("_ca", contactAddress);
-            UpdateDefinition<Tokens> update = Builders<Tokens>.Update.Set("mintAuthority", mintAuthority);
-            await _tokensCollection.UpdateOneAsync(filter, update);
-            return;
+            try
+            {
+                FilterDefinition<Tokens> filter = Builders<Tokens>.Filter.Eq("_ca", contactAddress);
+                UpdateDefinition<Tokens> update = Builders<Tokens>.Update.Set("mintAuthority", mintAuthority);
+                await _tokensCollection.UpdateOneAsync(filter, update);
+                return;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
         }
 
         public async Task AddHolder(string contactAddress, Holder holder)
         {
-            FilterDefinition<Tokens> filter = Builders<Tokens>.Filter.Eq("_ca", contactAddress);
-            UpdateDefinition<Tokens> update = Builders<Tokens>.Update.AddToSet<Holder>("holders", holder);
-            await _tokensCollection.UpdateOneAsync(filter, update);
-            return;
+            try
+            {
+                FilterDefinition<Tokens> filter = Builders<Tokens>.Filter.Eq("_ca", contactAddress);
+                UpdateDefinition<Tokens> update = Builders<Tokens>.Update.AddToSet<Holder>("holders", holder);
+                await _tokensCollection.UpdateOneAsync(filter, update);
+                return;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
         }
 
         public async Task AddHolder(string contactAddress, List<Holder> holder)
         {
-            FilterDefinition<Tokens> filter = Builders<Tokens>.Filter.Eq("_ca", contactAddress);
-            UpdateDefinition<Tokens> update = Builders<Tokens>.Update.AddToSet<List<Holder>>("holders", holder);
-            await _tokensCollection.UpdateOneAsync(filter, update);
-            return;
+            try
+            {
+                FilterDefinition<Tokens> filter = Builders<Tokens>.Filter.Eq("_ca", contactAddress);
+                UpdateDefinition<Tokens> update = Builders<Tokens>.Update.AddToSet<List<Holder>>("holders", holder);
+                await _tokensCollection.UpdateOneAsync(filter, update);
+                return;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
         }
 
         public async Task RemoveHolder(string contactAddress, Holder holder)
         {
-            FilterDefinition<Tokens> filter = Builders<Tokens>.Filter.Eq("_ca", contactAddress);
-            UpdateDefinition<Tokens> update = Builders<Tokens>.Update.Pull<Holder>("holders", holder);
-            await _tokensCollection.UpdateOneAsync(filter, update);
-            return;
+            try
+            {
+                FilterDefinition<Tokens> filter = Builders<Tokens>.Filter.Eq("_ca", contactAddress);
+                UpdateDefinition<Tokens> update = Builders<Tokens>.Update.Pull<Holder>("holders", holder);
+                await _tokensCollection.UpdateOneAsync(filter, update);
+                return;
+
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
         }
 
         public async Task RemoveHolder(string contactAddress, List<Holder> holder)
         {
-            FilterDefinition<Tokens> filter = Builders<Tokens>.Filter.Eq("_ca", contactAddress);
-            UpdateDefinition<Tokens> update = Builders<Tokens>.Update.Pull<List<Holder>>("holders", holder);
-            await _tokensCollection.UpdateOneAsync(filter, update);
-            return;
+            try
+            {
+                FilterDefinition<Tokens> filter = Builders<Tokens>.Filter.Eq("_ca", contactAddress);
+                UpdateDefinition<Tokens> update = Builders<Tokens>.Update.Pull<List<Holder>>("holders", holder);
+                await _tokensCollection.UpdateOneAsync(filter, update);
+                return;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
         }
 
         public async Task UpdateSocials(string contactAddress, Socials socials)
         {
-            FilterDefinition<Tokens> filter = Builders<Tokens>.Filter.Eq("_ca", contactAddress);
-            UpdateDefinition<Tokens> update = Builders<Tokens>.Update.Set("socials", socials);
-            await _tokensCollection.UpdateOneAsync(filter, update);
-            return;
+            try
+            {
+                FilterDefinition<Tokens> filter = Builders<Tokens>.Filter.Eq("_ca", contactAddress);
+                UpdateDefinition<Tokens> update = Builders<Tokens>.Update.Set("socials", socials);
+                await _tokensCollection.UpdateOneAsync(filter, update);
+                return;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
         }
     }
 }
