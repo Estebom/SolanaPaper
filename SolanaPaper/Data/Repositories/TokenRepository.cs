@@ -92,7 +92,7 @@ namespace SolanaPaper.Data.Repositories
             try
             {
                 FilterDefinition<Tokens> filter = Builders<Tokens>.Filter.Eq("_ca", contactAddress);
-                UpdateDefinition<Tokens> update = Builders<Tokens>.Update.AddToSet<Holder>("holders", holder);
+                UpdateDefinition<Tokens> update = Builders<Tokens>.Update.AddToSet("holders", holder);
                 await _tokensCollection.UpdateOneAsync(filter, update);
                 return;
             }
@@ -103,12 +103,12 @@ namespace SolanaPaper.Data.Repositories
             }
         }
 
-        public async Task AddHolder(string contactAddress, List<Holder> holder)
+        public async Task AddHolder(string contactAddress, List<Holder> holders)
         {
             try
             {
                 FilterDefinition<Tokens> filter = Builders<Tokens>.Filter.Eq("_ca", contactAddress);
-                UpdateDefinition<Tokens> update = Builders<Tokens>.Update.AddToSet<List<Holder>>("holders", holder);
+                UpdateDefinition<Tokens> update = Builders<Tokens>.Update.AddToSetEach("holders", holders);
                 await _tokensCollection.UpdateOneAsync(filter, update);
                 return;
             }
@@ -124,7 +124,7 @@ namespace SolanaPaper.Data.Repositories
             try
             {
                 FilterDefinition<Tokens> filter = Builders<Tokens>.Filter.Eq("_ca", contactAddress);
-                UpdateDefinition<Tokens> update = Builders<Tokens>.Update.Pull<Holder>("holders", holder);
+                UpdateDefinition<Tokens> update = Builders<Tokens>.Update.Pull("holders", holder);
                 await _tokensCollection.UpdateOneAsync(filter, update);
                 return;
 
@@ -136,12 +136,12 @@ namespace SolanaPaper.Data.Repositories
             }
         }
 
-        public async Task RemoveHolder(string contactAddress, List<Holder> holder)
+        public async Task RemoveHolder(string contactAddress, List<Holder> holders)
         {
             try
             {
                 FilterDefinition<Tokens> filter = Builders<Tokens>.Filter.Eq("_ca", contactAddress);
-                UpdateDefinition<Tokens> update = Builders<Tokens>.Update.Pull<List<Holder>>("holders", holder);
+                UpdateDefinition<Tokens> update = Builders<Tokens>.Update.PullAll("holders", holders);
                 await _tokensCollection.UpdateOneAsync(filter, update);
                 return;
             }

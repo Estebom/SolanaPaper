@@ -3,13 +3,14 @@ using MongoDB.Driver;
 using SolanaPaper.Data.Models;
 using SolanaPaper.Data.Repositories;
 using Microsoft.Extensions.Options;
+using Xunit.Sdk;
 
 namespace SolanaPaper.IntegrationTests
 {
     public class UsersRepositoryIntegrationTests
     {
 
-        private readonly UsersRepository usersRepository;
+        private readonly TokenRepository tokensRepository;
 
         public UsersRepositoryIntegrationTests()
         {
@@ -23,7 +24,7 @@ namespace SolanaPaper.IntegrationTests
 
             });
 
-            usersRepository = new UsersRepository(testMongoDBSettings);
+            tokensRepository = new TokenRepository(testMongoDBSettings);
 
         }
 
@@ -31,25 +32,27 @@ namespace SolanaPaper.IntegrationTests
         public async Task AddAsync_ShouldInsertUserIntoDatabase()
         {
             // Arrange
-            //Users user = new Users
-            //{
-            //    Username = "John Doe",
-            //    Email = "balls",
-            //    Stats = new Stats
-            //    {
-            //        Gains = 0,
-            //        Losses = 0,
-            //        Ratio = 0,
-            //        RugCount = 0
-            //    },
-            //    Holdings = new List<string> { "1", "2" }
+            //var token = new Tokens() {
+                
+            //    ContactAddress="123",
+            //    Symbol="$penis",
+            //    MintAuthority="121451",
+            //    Creator="boy",
+            //    MintDate=DateTime.Now,
+            //    Holders = { }
+            
             //};
 
-            await usersRepository.AddToHoldings("John Doe", "pep");
-
-            Users users = await usersRepository.GetByUsername("John Doe");
-
-            Console.WriteLine(users.Holdings);
+            //try
+            //{
+            //    Users users = await usersRepository.GetByUsername("John Doe");
+            //    Console.WriteLine(users.Username);
+            //}
+            //catch (Exception ex) 
+            //{
+            //    Console.WriteLine(ex.Message);
+            //}
+            
 
 
 

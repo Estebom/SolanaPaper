@@ -32,7 +32,7 @@ namespace SolanaPaper.Data.Models
 
         [BsonElement("holders")]
         [JsonPropertyName("holders")]
-        public List<Holder> Holders { get; set; } = null!;
+        public List<Holder> Holders { get; set; } = new List<Holder>();
 
         [BsonElement("socials")]
         [JsonPropertyName("socials")]

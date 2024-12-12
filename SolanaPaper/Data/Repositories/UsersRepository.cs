@@ -104,7 +104,6 @@ namespace SolanaPaper.Data.Repositories
             }
         }
 
-        //TODO FIX THHIS
         public async Task AddToHoldings(string user, List<string> holdings)
         {
             try
