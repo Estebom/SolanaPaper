@@ -11,8 +11,19 @@ namespace SolanaPaper.Data.Models
         public string? Id { get; set; }
 
         [BsonElement("_user")]
-        public string? username { get; set; } = null!;
+        [JsonPropertyName("_user")]
+        public string Username { get; set; } = null!;
 
+        [BsonElement("email")]
+        [JsonPropertyName("email")]
+        public string Email { get; set; } = null!;
 
+        [BsonElement("stats")]
+        [JsonPropertyName("stats")]
+        public Stats Stats { get; set; } = null!;
+
+        [BsonElement("holdings")]
+        [JsonPropertyName("holdings")]
+        public string[] Holdings { get; set; } = null!;
     }
 }
