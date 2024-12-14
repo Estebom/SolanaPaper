@@ -5,6 +5,8 @@ VisualStudioVersion = 17.11.35222.181
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SolanaPaper", "SolanaPaper\SolanaPaper.csproj", "{395023B0-666A-4990-9A29-2470D68FD74E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SolanaPaper.IntegrationTests", "SolanaPaper.IntegrationTests\SolanaPaper.IntegrationTests.csproj", "{F180AB61-EC16-440B-920C-B5C005D987BC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{395023B0-666A-4990-9A29-2470D68FD74E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{395023B0-666A-4990-9A29-2470D68FD74E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{395023B0-666A-4990-9A29-2470D68FD74E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F180AB61-EC16-440B-920C-B5C005D987BC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F180AB61-EC16-440B-920C-B5C005D987BC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F180AB61-EC16-440B-920C-B5C005D987BC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F180AB61-EC16-440B-920C-B5C005D987BC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

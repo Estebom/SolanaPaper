@@ -24,6 +24,6 @@ namespace SolanaPaper.Data.Models
 
         [BsonElement("holdings")]
         [JsonPropertyName("holdings")]
-        public string[] Holdings { get; set; } = null!;
+        public List<string> Holdings { get; set; } = new List<string>();
     }
 }
