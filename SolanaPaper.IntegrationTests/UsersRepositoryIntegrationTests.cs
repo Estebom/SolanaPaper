@@ -10,7 +10,7 @@ namespace SolanaPaper.IntegrationTests
     public class UsersRepositoryIntegrationTests
     {
 
-        private readonly TokenRepository tokensRepository;
+        private readonly MarketDataRepository marketRepository;
 
         public UsersRepositoryIntegrationTests()
         {
@@ -24,38 +24,76 @@ namespace SolanaPaper.IntegrationTests
 
             });
 
-            tokensRepository = new TokenRepository(testMongoDBSettings);
+            marketRepository = new MarketDataRepository(testMongoDBSettings);
 
         }
 
         [Fact]
         public async Task AddAsync_ShouldInsertUserIntoDatabase()
         {
-            // Arrange
-            //var token = new Tokens() {
-                
-            //    ContactAddress="123",
-            //    Symbol="$penis",
-            //    MintAuthority="121451",
-            //    Creator="boy",
-            //    MintDate=DateTime.Now,
-            //    Holders = { }
-            
+            ////// Arrange
+            //Tokens token = new Tokens()
+            //{
+
+            //    ContactAddress = "1234",
+            //    Symbol = "$penis",
+            //    MintAuthority = "121451",
+            //    Creator = "boy",
+            //    MintDate = DateTime.Now,
+            //    Holders = new List<Holder>()
+            //    {
+            //        new Holder()
+            //        {
+            //            WalletKey = "123",
+            //            TokensHeld = 100
+            //        }
+            //    },
+            //    SocialLinks = new Socials()
+            //    {
+            //        TwitterLink = "https://twitter.com",
+            //        TelegramLink = "https://t.me",
+            //        WebsiteLink = "https://website.com"
+            //    }
+
             //};
 
-            //try
+            //await tokensRepository.Create(token);
+
+            ///NEXT DO GET BY SYMBOL
+            //List<Tokens> tokens = await tokensRepository.GetBySymbol("$penis");
+
+            //foreach (var t in tokens)
             //{
-            //    Users users = await usersRepository.GetByUsername("John Doe");
-            //    Console.WriteLine(users.Username);
+            //    Console.WriteLine(t.Symbol);
             //}
-            //catch (Exception ex) 
+            //Console.WriteLine(tokens.Count);
+
+            //await tokensRepository.UpdateSocials("1234", new Socials() { TelegramLink="boy", TwitterLink="eat", WebsiteLink="myballs"});
+
+            //Tokens token = await tokensRepository.GetByContactAddress("1234");
+            //Console.WriteLine(token.SocialLinks.WebsiteLink);
+
+            //foreach (var t in token.Holders)
             //{
-            //    Console.WriteLine(ex.Message);
+            //    Console.WriteLine(t.Soc);
             //}
-            
 
+            //await marketRepository.Create(new List<MarketData>() { new MarketData() { ContactAddress = "69", CurrentSupply = 100, MarketCap = 1100000, Price = .001, Timestamp = DateTime.Now }, new MarketData() { ContactAddress = "73", CurrentSupply = 100, MarketCap = 1100000, Price = .001, Timestamp = DateTime.Now } });
 
+            await marketRepository.Delete(new List<string>() { "69", "73"} );
 
+            List<MarketData> marketData = await marketRepository.GetByContactAddress("69");
+            List<MarketData> marketsData = await marketRepository.GetByContactAddress("73");
+
+            foreach (var m in marketData)
+            {
+                Console.WriteLine(m.MarketCap);
+                
+            }
+            foreach(var m in marketsData)
+            {
+                Console.WriteLine(m.ContactAddress);
+            }
         }
     }
 }

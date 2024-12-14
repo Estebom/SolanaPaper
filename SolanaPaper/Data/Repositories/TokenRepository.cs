@@ -47,7 +47,7 @@ namespace SolanaPaper.Data.Repositories
         {
             try
             {
-                FilterDefinition<Tokens> filter = Builders<Tokens>.Filter.In("symbol", symbol);
+                FilterDefinition<Tokens> filter = Builders<Tokens>.Filter.AnyEq("symbol", symbol);
                 return await _tokensCollection.Find(filter).ToListAsync();
             }
             catch (Exception e)

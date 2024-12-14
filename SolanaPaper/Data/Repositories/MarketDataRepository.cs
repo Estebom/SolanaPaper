@@ -60,27 +60,27 @@ namespace SolanaPaper.Data.Repositories
             }
         }
 
-        public async Task Update(string contactAddress, MarketData marketData)
-        {
-            try
-            {
-                FilterDefinition<MarketData> filter = Builders<MarketData>.Filter.Eq("_ca", contactAddress);
-                await _marketDataCollection.ReplaceOneAsync(filter, marketData);
-                return;
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-                throw;
-            }
-        }
+        //public async Task Update(string contactAddress, MarketData marketData)
+        //{
+        //    try
+        //    {
+        //        FilterDefinition<MarketData> filter = Builders<MarketData>.Filter.Eq("_ca", contactAddress);
+        //        await _marketDataCollection.ReplaceOneAsync(filter, marketData);
+        //        return;
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        Console.WriteLine(e);
+        //        throw;
+        //    }
+        //}
 
         public async Task Delete(string contactAddress)
         {
             try
             {
-                FilterDefinition<MarketData> filter = Builders<MarketData>.Filter.Eq("_ca", contactAddress);
-                await _marketDataCollection.DeleteOneAsync(filter);
+                FilterDefinition<MarketData> filter = Builders<MarketData>.Filter.AnyEq("_ca", contactAddress);
+                await _marketDataCollection.DeleteManyAsync(filter);
                 return;
             }
             catch (Exception e)
