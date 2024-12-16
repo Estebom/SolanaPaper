@@ -3,6 +3,7 @@ using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 using MongoDB.Bson;
 using System.Runtime.CompilerServices;
+using SolanaPaper.Data.Models.ServiceSettings;
 
 namespace SolanaPaper.Data.Repositories
 {

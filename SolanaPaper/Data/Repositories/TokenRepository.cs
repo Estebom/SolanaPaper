@@ -2,6 +2,7 @@
 using SolanaPaper.Data.Models;
 using MongoDB.Driver;
 using MongoDB.Bson;
+using SolanaPaper.Data.Models.ServiceSettings;
 
 namespace SolanaPaper.Data.Repositories
 {
@@ -159,6 +160,21 @@ namespace SolanaPaper.Data.Repositories
                 FilterDefinition<Tokens> filter = Builders<Tokens>.Filter.Eq("_ca", contactAddress);
                 UpdateDefinition<Tokens> update = Builders<Tokens>.Update.Set("socials", socials);
                 await _tokensCollection.UpdateOneAsync(filter, update);
+                return;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
+        }
+
+        public async Task Delete(string contactAddress)
+        {
+            try
+            {
+                FilterDefinition<Tokens> filter = Builders<Tokens>.Filter.Eq("_ca", contactAddress);
+                await _tokensCollection.DeleteOneAsync(filter);
                 return;
             }
             catch (Exception e)

@@ -4,96 +4,37 @@ using SolanaPaper.Data.Models;
 using SolanaPaper.Data.Repositories;
 using Microsoft.Extensions.Options;
 using Xunit.Sdk;
+using SolanaPaper.Services.Solana;
+using Solnet.Rpc;
+using Solnet.Programs.Models.NameService;
 
 namespace SolanaPaper.IntegrationTests
 {
     public class UsersRepositoryIntegrationTests
     {
 
-        private readonly MarketDataRepository marketRepository;
+        TokenDataFetcherService tokenService;
 
         public UsersRepositoryIntegrationTests()
         {
-            var testMongoDBSettings = Options.Create(new MongoDBSettings
-            {
-                ConnectionURI = "mongodb+srv://estebom:spiderGuar1463@estebom.y4jnl.mongodb.net/?retryWrites=true&w=majority&appName=Estebom",
-                DatabaseName = "SolanaPaper",
-                CollectionName1 = "Users",
-                CollectionName2 = "Tokens",
-                CollectionName3 = "MarketData"
-
-            });
-
-            marketRepository = new MarketDataRepository(testMongoDBSettings);
-
+            tokenService = new TokenDataFetcherService();
         }
 
         [Fact]
-        public async Task AddAsync_ShouldInsertUserIntoDatabase()
+        public async Task Test_GetTokenInfoFromMintAsync()
         {
-            ////// Arrange
-            //Tokens token = new Tokens()
-            //{
+            var tokenService = new TokenDataFetcherService();
 
-            //    ContactAddress = "1234",
-            //    Symbol = "$penis",
-            //    MintAuthority = "121451",
-            //    Creator = "boy",
-            //    MintDate = DateTime.Now,
-            //    Holders = new List<Holder>()
-            //    {
-            //        new Holder()
-            //        {
-            //            WalletKey = "123",
-            //            TokensHeld = 100
-            //        }
-            //    },
-            //    SocialLinks = new Socials()
-            //    {
-            //        TwitterLink = "https://twitter.com",
-            //        TelegramLink = "https://t.me",
-            //        WebsiteLink = "https://website.com"
-            //    }
-
-            //};
-
-            //await tokensRepository.Create(token);
-
-            ///NEXT DO GET BY SYMBOL
-            //List<Tokens> tokens = await tokensRepository.GetBySymbol("$penis");
-
-            //foreach (var t in tokens)
-            //{
-            //    Console.WriteLine(t.Symbol);
-            //}
-            //Console.WriteLine(tokens.Count);
-
-            //await tokensRepository.UpdateSocials("1234", new Socials() { TelegramLink="boy", TwitterLink="eat", WebsiteLink="myballs"});
-
-            //Tokens token = await tokensRepository.GetByContactAddress("1234");
-            //Console.WriteLine(token.SocialLinks.WebsiteLink);
-
-            //foreach (var t in token.Holders)
-            //{
-            //    Console.WriteLine(t.Soc);
-            //}
-
-            //await marketRepository.Create(new List<MarketData>() { new MarketData() { ContactAddress = "69", CurrentSupply = 100, MarketCap = 1100000, Price = .001, Timestamp = DateTime.Now }, new MarketData() { ContactAddress = "73", CurrentSupply = 100, MarketCap = 1100000, Price = .001, Timestamp = DateTime.Now } });
-
-            await marketRepository.Delete(new List<string>() { "69", "73"} );
-
-            List<MarketData> marketData = await marketRepository.GetByContactAddress("69");
-            List<MarketData> marketsData = await marketRepository.GetByContactAddress("73");
-
-            foreach (var m in marketData)
+            var result = await tokenService.GetTokenByContactAddress("EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v");
+            if (result != null)
             {
-                Console.WriteLine(m.MarketCap);
-                
+                Console.WriteLine($"Token Name: {result.Name}");
             }
-            foreach(var m in marketsData)
+            else
             {
-                Console.WriteLine(m.ContactAddress);
+                Console.WriteLine("Token data not found.");
             }
         }
-    }
+
+        }
 }

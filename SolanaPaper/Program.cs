@@ -1,12 +1,14 @@
-using SolanaPaper.Data.Models;
 using SolanaPaper.Data.Repositories;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using SolanaPaper.Data;
+using SolanaPaper.Data.Models.ServiceSettings;
+using SolanaPaper.Services.Solana;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.Configure<MongoDBSettings>(builder.Configuration.GetSection("MongoDB"));
+builder.Services.Configure<SolanaSettings>(builder.Configuration.GetSection("Solana"));
 builder.Services.AddSingleton<UsersRepository>();
 builder.Services.AddSingleton<TokenRepository>();
 builder.Services.AddSingleton<MarketDataRepository>();

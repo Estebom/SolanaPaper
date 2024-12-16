@@ -1,4 +1,4 @@
-﻿namespace SolanaPaper.Data.Models
+﻿namespace SolanaPaper.Data.Models.ServiceSettings
 {
     public class MongoDBSettings
     {
