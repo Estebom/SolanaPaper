@@ -80,7 +80,7 @@ namespace NameServiceTests
 
             Console.WriteLine(response.Content);
 
-            OHLCData token = JsonConvert.DeserializeObject<OHLCData>(response.Content);
+            OHLCVData token = JsonConvert.DeserializeObject<OHLCVData>(response.Content);
 
             Console.WriteLine(token);
 

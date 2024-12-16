@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace SolanaPaper.Data.Models
 { 
-        public class OHLCData
+        public class OHLCVData
         {
             public SolanaData Data { get; set; }
         }
