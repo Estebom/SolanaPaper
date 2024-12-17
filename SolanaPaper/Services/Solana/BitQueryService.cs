@@ -16,14 +16,16 @@ namespace SolanaPaper.Services.Solana
         }
 
 
-        public async Task<OHLCVData> GetOHLCV(string contactAddress, string programId, string unitOfTime, string count, string counter)
+
+
+        public async Task<OHLCVData> GetOHLCV(string contactAddress, string programId= "6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P", string unitOfTime="minutes", string count="1", string counter="1")
         {
             try
             {
                 var request = new RestRequest("/eap", Method.Post);
                 request.AddHeader("Content-Type", "application/json");
                 request.AddHeader("Authorization", $"Bearer {BitQuerySettings.AccessToken}\t");
-                var body = @"{""query"":""{\n  Solana {\n    DEXTradeByTokens(\n      limit: {count: {count}}\n      orderBy: {descendingByField: \""Block_Timefield\""}\n      where: {Trade: {Currency: {MintAddress: {is: \""{MintAddress}\""}}, Dex: {ProgramAddress: {is: \""{ProgramAddress}\""}}, PriceAsymmetry: {lt: 0.1}}}\n    ) {\n      Block {\n        Timefield: Time(interval: {in: {unitOfTime}, count: {counter}})\n      }\n      volume: sum(of: Trade_Amount)\n      Trade {\n        high: Price(maximum: Trade_Price)\n        low: Price(minimum: Trade_Price)\n        open: Price(minimum: Block_Slot)\n        close: Price(maximum: Block_Slot)\n      }\n      count\n    }\n  }\n}\n"",""variables"":""{}""}";
+                var body = @"{""query"":""{\n  Solana {\n    DEXTradeByTokens(\n      limit: {count: {count}}\n      orderBy: {ascendingByField: \""Block_Timefield\""}\n      where: {Trade: {Currency: {MintAddress: {is: \""{MintAddress}\""}}, Dex: {ProgramAddress: {is: \""{ProgramAddress}\""}}, PriceAsymmetry: {lt: 0.1}}}\n    ) {\n      Block {\n        Timefield: Time(interval: {in: {unitOfTime}, count: {counter}})\n      }\n      volume: sum(of: Trade_Amount)\n      Trade {\n        high: Price(maximum: Trade_Price)\n        low: Price(minimum: Trade_Price)\n        open: Price(minimum: Block_Slot)\n        close: Price(maximum: Block_Slot)\n      }\n      count\n    }\n  }\n}\n"",""variables"":""{}""}";
 
                 StringBuilder sb = new StringBuilder(body);
                 sb.Replace("{MintAddress}", contactAddress);

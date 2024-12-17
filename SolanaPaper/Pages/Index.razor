@@ -1,0 +1,166 @@
+﻿@page "/"
+@using SolanaPaper.Data.Models
+@using SolanaPaper.Services.Solana
+@using SolanaPaper.Data.Models.ModelBuilders;
+@using TradingView.Blazor;
+@using TradingView.Blazor.Models
+@using System.Net;
+@using System.Text;
+
+<PageTitle>Index</PageTitle>
+
+<h1>Hello, world!</h1>
+
+Welcome to your new app.
+
+<SurveyPrompt Title="How is Blazor working for you?" />
+
+<TradingViewChart @ref=myChart />
+
+
+@code
+{
+    BitQueryService bitQueryService = new BitQueryService();
+
+    TradingViewChart? myChart;
+
+
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+            return;
+
+        try
+        {
+            var ohlcv = await bitQueryService.GetOHLCV("59dNifHEVjjyvDPqMm1HoNpffJVYwfciGHUrahpSpump", "6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P", "minutes", "5", "1");
+
+
+            var ohlcvEntries = OhlcvBuilder.OhlcvModelBuilder(ohlcv);
+
+            // List<OHLCVData> ohlcvDataList = new List<OHLCVData>
+            // {
+            //     new OHLCVData
+            //     {
+            //         Data = new SolanaData
+            //         {
+            //             Solana = new SolanaTrades
+            //             {
+            //                 DEXTradeByTokens = new List<DEXTradeByTokens>
+            //                 {
+            //                     new DEXTradeByTokens
+            //                     {
+            //                         Block = new Block { Timefield = DateTime.UtcNow.AddMinutes(-4) },
+            //                         Trade = new Trade
+            //                         {
+            //                             Open = 0.00000021,
+            //                             High = 0.00000022,
+            //                             Low = 0.00000020,
+            //                             Close = 0.000000218
+            //                         },
+            //                         Volume = 1500
+            //                     },
+            //                     new DEXTradeByTokens
+            //                     {
+            //                         Block = new Block { Timefield = DateTime.UtcNow.AddMinutes(-3) },
+            //                         Trade = new Trade
+            //                         {
+            //                             Open = 0.000000218,
+            //                             High = 0.000000225,
+            //                             Low = 0.000000215,
+            //                             Close = 0.000000220
+            //                         },
+            //                         Volume = 2000
+            //                     },
+            //                     new DEXTradeByTokens
+            //                     {
+            //                         Block = new Block { Timefield = DateTime.UtcNow.AddMinutes(-2) },
+            //                         Trade = new Trade
+            //                         {
+            //                             Open = 0.000000220,
+            //                             High = 0.000000228,
+            //                             Low = 0.000000219,
+            //                             Close = 0.000000224
+            //                         },
+            //                         Volume = 1800
+            //                     },
+            //                     new DEXTradeByTokens
+            //                     {
+            //                         Block = new Block { Timefield = DateTime.UtcNow.AddMinutes(-1) },
+            //                         Trade = new Trade
+            //                         {
+            //                             Open = 0.000000224,
+            //                             High = 0.000000230,
+            //                             Low = 0.000000223,
+            //                             Close = 0.000000226
+            //                         },
+            //                         Volume = 1700
+            //                     },
+            //                     new DEXTradeByTokens
+            //                     {
+            //                         Block = new Block { Timefield = DateTime.UtcNow },
+            //                         Trade = new Trade
+            //                         {
+            //                             Open = 0.000000226,
+            //                             High = 0.000000228,
+            //                             Low = 0.000000222,
+            //                             Close = 0.000000223
+            //                         },
+            //                         Volume = 1900
+            //                     }
+            //                 }
+            //             }
+            //         }
+            //     }
+            // };
+
+
+            // var ohlcvEntries = OhlcvBuilder.OhlcvModelBuilder(ohlcvDataList[0]);
+
+            // Load the data
+            ChartData data = new()
+                {
+                 ChartEntries = new List<IChartEntry>(ohlcvEntries),
+                    MarkerData = new List<Marker>()
+                };
+
+            Console.WriteLine(data.ChartEntries);
+
+            foreach (var entry in data.ChartEntries)
+            {
+                Console.WriteLine(entry.DisplayPrice);
+                Console.WriteLine($"Time: {entry.Time}, Price: {entry.DisplayPrice}");
+
+            }
+
+            Console.WriteLine(data.ChartEntries.Count);
+
+            // Optionally define options
+            ChartOptions options = new()
+                {
+                    
+                    TimeScaleSecondsVisible = true,
+                    Width = 800, // Fixed width for debugging
+                    Height = 400 // Add a fixed height
+                    
+                };
+
+            if (myChart != null)
+            {
+                Console.WriteLine("Loading chart...");
+                await myChart.LoadChartAsync(data, options);
+                Console.WriteLine("Chart loaded successfully.");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error loading chart: {ex.Message}");
+        }
+    }
+
+    public async Task UpdateChart(ChartData updatedChartData)
+    {
+        await myChart.UpdateChartAsync(updatedChartData);
+    }
+
+}

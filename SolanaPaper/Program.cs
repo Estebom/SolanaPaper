@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Components.Web;
 using SolanaPaper.Data;
 using SolanaPaper.Data.Models.ServiceSettings;
 using SolanaPaper.Services.Solana;
+using SolanaPaper.Pages;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,6 +13,7 @@ builder.Services.Configure<SolanaSettings>(builder.Configuration.GetSection("Sol
 builder.Services.AddSingleton<UsersRepository>();
 builder.Services.AddSingleton<TokenRepository>();
 builder.Services.AddSingleton<MarketDataRepository>();
+//builder.Services.AddSingleton<BitQueryService>();
 
 // Add services to the container.
 builder.Services.AddRazorPages();

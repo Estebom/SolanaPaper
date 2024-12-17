@@ -99,7 +99,7 @@ namespace NameServiceTests
 
             BitQueryService bitQueryService = new BitQueryService();
 
-            OHLCVData token = await bitQueryService.GetOHLCV("4vcmc5fiawMcmFGJmGCDAza9cEZMuL3xBNAUoi97pump", "6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P", "minutes", "5", "1");
+            OHLCVData token = await bitQueryService.GetOHLCV("4vcmc5fiawMcmFGJmGCDAza9cEZMuL3xBNAUoi97pump", "6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P", "minutes", "5", "10");
             Console.WriteLine(token);
 
             foreach (DEXTradeByTokens trade in token.Data.Solana.DEXTradeByTokens)

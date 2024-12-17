@@ -3,11 +3,12 @@ using TradingView.Blazor.Models;
 
 namespace SolanaPaper.Data.Models.ModelBuilders
 {
-    public class OhlcvBuilder
+    public static class OhlcvBuilder
     {
-       
-        public List<Ohlcv> OhlcvModelBuilder(OHLCVData ohlcv) 
+
+        public static List<Ohlcv> OhlcvModelBuilder(OHLCVData ohlcv) 
         {
+
             List<Ohlcv> ohlcvModels = new List<Ohlcv>();
 
             foreach (DEXTradeByTokens transaction in ohlcv.Data.Solana.DEXTradeByTokens)
@@ -19,12 +20,14 @@ namespace SolanaPaper.Data.Models.ModelBuilders
                 ohlcvModel.High = (decimal)transaction.Trade.High;
                 ohlcvModel.Low = (decimal)transaction.Trade.Low;
                 ohlcvModel.Volume = (decimal)transaction.Volume;
+
+                ohlcvModels.Add(ohlcvModel);
             }
 
             return ohlcvModels;
         }
 
-        public List<List<Ohlcv>> OhlcvModelBuilder(List<OHLCVData> ohlcvs) 
+        public static List<List<Ohlcv>> OhlcvModelBuilder(List<OHLCVData> ohlcvs) 
         {
             List<List<Ohlcv>> ohlcvModels = new List<List<Ohlcv>>();
             foreach (OHLCVData v in ohlcvs) 
