@@ -19,6 +19,8 @@ using System.Net.Http.Json;
 using System.Text.Json.Serialization;
 using SolanaPaper.Data.Models;
 using Newtonsoft.Json;
+using System.Text;
+using SolanaPaper.Services.Solana;
 
 
 namespace NameServiceTests
@@ -58,37 +60,52 @@ namespace NameServiceTests
             //    Console.WriteLine("Failed");
             //}
 
-            var options = new RestClientOptions("https://streaming.bitquery.io")
-            {
-                MaxTimeout = -1
-            };
-            var client = new RestClient(options);
+            //var options = new RestClientOptions("https://streaming.bitquery.io")
+            //{
+            //    MaxTimeout = -1
+            //};
+            //var client = new RestClient(options);
 
-            var request = new RestRequest("/eap", Method.Post);
-            request.AddHeader("Content-Type", "application/json");
-            request.AddHeader("Authorization", "Bearer ory_at_ky-xwa50B_7OvFOwfauOW-cZvQeFdaCgUjhI9Bf1_xI.2Zyl29Qk3I2klchaFIMisUMparWUZ4c1PkvxIWW2hPk\t");
-            var body = @"{""query"":""{\n  Solana {\n    DEXTradeByTokens(\n      limit: {count: 10}\n      orderBy: {descendingByField: \""Block_Timefield\""}\n      where: {Trade: {Currency: {MintAddress: {is: \""HS4mBT4ca67LErBGELZEBRfBscT88Cmw26tienj2pump\""}}, Dex: {ProgramAddress: {is: \""6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P\""}}, PriceAsymmetry: {lt: 0.1}}}\n    ) {\n      Block {\n        Timefield: Time(interval: {in: seconds, count: 10})\n      }\n      volume: sum(of: Trade_Amount)\n      Trade {\n        high: Price(maximum: Trade_Price)\n        low: Price(minimum: Trade_Price)\n        open: Price(minimum: Block_Slot)\n        close: Price(maximum: Block_Slot)\n      }\n      count\n    }\n  }\n}\n"",""variables"":""{}""}";
-            request.AddStringBody(body, DataFormat.Json);
+            //var request = new RestRequest("/eap", Method.Post);
+            //request.AddHeader("Content-Type", "application/json");
+            //request.AddHeader("Authorization", "Bearer ory_at_ky-xwa50B_7OvFOwfauOW-cZvQeFdaCgUjhI9Bf1_xI.2Zyl29Qk3I2klchaFIMisUMparWUZ4c1PkvxIWW2hPk\t");
+            //string dynamic = "4vcmc5fiawMcmFGJmGCDAza9cEZMuL3xBNAUoi97pump";
+            //var body = @"{""query"":""{\n  Solana {\n    DEXTradeByTokens(\n      limit: {count: 10}\n      orderBy: {descendingByField: \""Block_Timefield\""}\n      where: {Trade: {Currency: {MintAddress: {is: \""{MintAddress}\""}}, Dex: {ProgramAddress: {is: \""6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P\""}}, PriceAsymmetry: {lt: 0.1}}}\n    ) {\n      Block {\n        Timefield: Time(interval: {in: minutes, count: 1})\n      }\n      volume: sum(of: Trade_Amount)\n      Trade {\n        high: Price(maximum: Trade_Price)\n        low: Price(minimum: Trade_Price)\n        open: Price(minimum: Block_Slot)\n        close: Price(maximum: Block_Slot)\n      }\n      count\n    }\n  }\n}\n"",""variables"":""{}""}";
+            //var sb = new StringBuilder(body);
+            //sb.Replace("{MintAddress}", dynamic);
+            //body = sb.ToString();
 
-            RestResponse response = await client.ExecuteAsync(request);
+            //request.AddStringBody(body, DataFormat.Json);
 
-            if (response.Content == null)
-            {
-                Console.WriteLine("Response content is null");
-                return;
-            }
+            //RestResponse response = await client.ExecuteAsync(request);
 
-            Console.WriteLine(response.Content);
+            //if (response.Content == null)
+            //{
+            //    Console.WriteLine("Response content is null");
+            //    return;
+            //}
 
-            OHLCVData token = JsonConvert.DeserializeObject<OHLCVData>(response.Content);
+            //Console.WriteLine(response.Content);
 
+            //OHLCVData token = JsonConvert.DeserializeObject<OHLCVData>(response.Content);
+
+            //Console.WriteLine(token);
+
+            //foreach (DEXTradeByTokens trade in token.Data.Solana.DEXTradeByTokens)
+            //{
+            //    Console.WriteLine(trade.Volume);
+            //}
+            //Console.WriteLine(token.Solana.DEXTradeByTokens.Count);
+
+            BitQueryService bitQueryService = new BitQueryService();
+
+            OHLCVData token = await bitQueryService.GetOHLCV("4vcmc5fiawMcmFGJmGCDAza9cEZMuL3xBNAUoi97pump", "6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P", "minutes", "5", "1");
             Console.WriteLine(token);
 
             foreach (DEXTradeByTokens trade in token.Data.Solana.DEXTradeByTokens)
             {
                 Console.WriteLine(trade.Volume);
             }
-            //Console.WriteLine(token.Solana.DEXTradeByTokens.Count);
 
         }
     }
