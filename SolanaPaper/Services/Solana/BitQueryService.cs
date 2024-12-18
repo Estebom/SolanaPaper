@@ -18,7 +18,7 @@ namespace SolanaPaper.Services.Solana
 
 
 
-        public async Task<OHLCVData> GetOHLCV(string contactAddress, string programId= "6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P", string unitOfTime="minutes", string count="1", string counter="1")
+        public async Task<OhlcvVM> GetOHLCV(string contactAddress, string programId= "6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P", string unitOfTime="minutes", string count="1", string counter="1")
         {
             try
             {
@@ -41,7 +41,7 @@ namespace SolanaPaper.Services.Solana
 
                 if (response.IsSuccessful)
                 {
-                    return JsonConvert.DeserializeObject<OHLCVData>(response.Content);
+                    return JsonConvert.DeserializeObject<OhlcvVM>(response.Content);
                 }
                 else
                 {

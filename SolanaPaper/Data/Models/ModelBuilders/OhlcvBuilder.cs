@@ -6,7 +6,7 @@ namespace SolanaPaper.Data.Models.ModelBuilders
     public static class OhlcvBuilder
     {
 
-        public static List<Ohlcv> OhlcvModelBuilder(OHLCVData ohlcv) 
+        public static List<Ohlcv> OhlcvModelBuilder(OhlcvVM ohlcv) 
         {
 
             List<Ohlcv> ohlcvModels = new List<Ohlcv>();
@@ -27,10 +27,31 @@ namespace SolanaPaper.Data.Models.ModelBuilders
             return ohlcvModels;
         }
 
-        public static List<List<Ohlcv>> OhlcvModelBuilder(List<OHLCVData> ohlcvs) 
+        public static List<Ohlcv> OhlcvModelBuilder(List<OhlcvDTO> ohlcvs)
+        {
+
+            List<Ohlcv> ohlcvModels = new List<Ohlcv>();
+
+            foreach (OhlcvDTO transaction in ohlcvs)
+            {
+                Ohlcv ohlcvModel = new Ohlcv();
+                ohlcvModel.Time = transaction.Time;
+                ohlcvModel.Close = transaction.Close;
+                ohlcvModel.Open = transaction.Open;
+                ohlcvModel.High = transaction.High;
+                ohlcvModel.Low = transaction.Low;
+                ohlcvModel.Volume = transaction.Volume;
+
+                ohlcvModels.Add(ohlcvModel);
+            }
+
+            return ohlcvModels;
+        }
+
+        public static List<List<Ohlcv>> OhlcvModelBuilder(List<OhlcvVM> ohlcvs) 
         {
             List<List<Ohlcv>> ohlcvModels = new List<List<Ohlcv>>();
-            foreach (OHLCVData v in ohlcvs) 
+            foreach (OhlcvVM v in ohlcvs) 
             {
                 ohlcvModels.Add(OhlcvModelBuilder(v));
             }

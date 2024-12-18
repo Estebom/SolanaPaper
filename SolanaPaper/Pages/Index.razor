@@ -1,5 +1,7 @@
 ﻿@page "/"
 @using SolanaPaper.Data.Models
+@using SolanaPaper.Data.Repositories
+@using SolanaPaper.Services
 @using SolanaPaper.Services.Solana
 @using SolanaPaper.Data.Models.ModelBuilders;
 @using TradingView.Blazor;
@@ -20,11 +22,18 @@ Welcome to your new app.
 
 @code
 {
+    [Inject]
+    OhlcvRepository ohlcvRepository { get; set; }
+
     BitQueryService bitQueryService = new BitQueryService();
 
     TradingViewChart? myChart;
 
-
+    string mintAddress = "EqFvmyocakvpTc14hYxdXDno81bLnUaQjwmpyHrLpump";
+    string programID = "6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P";
+    string interval = "minutes";
+    string limit = "160";
+    string count = "1";
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -33,94 +42,29 @@ Welcome to your new app.
 
         try
         {
-            var ohlcv = await bitQueryService.GetOHLCV("59dNifHEVjjyvDPqMm1HoNpffJVYwfciGHUrahpSpump", "6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P", "minutes", "5", "1");
+            List<Ohlcv> ohlcvEntries = new List<Ohlcv>();
+            // query from mongo before bitquery
+            var ohlcvDTOs = await ohlcvRepository.GetByContactAddress(mintAddress);
+            ohlcvEntries.AddRange(OhlcvBuilder.OhlcvModelBuilder(ohlcvDTOs));
 
+            if (ohlcvEntries.Count < Convert.ToInt32(limit))
+            {
+                Console.WriteLine("Fetching from BitQuery...");
+                var ohlcv = await bitQueryService.GetOHLCV(mintAddress, programID, interval, (Convert.ToInt32(limit) - ohlcvEntries.Count).ToString(), "1");
+                var newOhlcvDTOs = OhlcvDTOBuilder.OhlcvModelBuilder(ohlcv, mintAddress);
+                await ohlcvRepository.Create(newOhlcvDTOs);
+                ohlcvEntries.AddRange(OhlcvBuilder.OhlcvModelBuilder(newOhlcvDTOs));
+            }
 
-            var ohlcvEntries = OhlcvBuilder.OhlcvModelBuilder(ohlcv);
+           
 
-            // List<OHLCVData> ohlcvDataList = new List<OHLCVData>
-            // {
-            //     new OHLCVData
-            //     {
-            //         Data = new SolanaData
-            //         {
-            //             Solana = new SolanaTrades
-            //             {
-            //                 DEXTradeByTokens = new List<DEXTradeByTokens>
-            //                 {
-            //                     new DEXTradeByTokens
-            //                     {
-            //                         Block = new Block { Timefield = DateTime.UtcNow.AddMinutes(-4) },
-            //                         Trade = new Trade
-            //                         {
-            //                             Open = 0.00000021,
-            //                             High = 0.00000022,
-            //                             Low = 0.00000020,
-            //                             Close = 0.000000218
-            //                         },
-            //                         Volume = 1500
-            //                     },
-            //                     new DEXTradeByTokens
-            //                     {
-            //                         Block = new Block { Timefield = DateTime.UtcNow.AddMinutes(-3) },
-            //                         Trade = new Trade
-            //                         {
-            //                             Open = 0.000000218,
-            //                             High = 0.000000225,
-            //                             Low = 0.000000215,
-            //                             Close = 0.000000220
-            //                         },
-            //                         Volume = 2000
-            //                     },
-            //                     new DEXTradeByTokens
-            //                     {
-            //                         Block = new Block { Timefield = DateTime.UtcNow.AddMinutes(-2) },
-            //                         Trade = new Trade
-            //                         {
-            //                             Open = 0.000000220,
-            //                             High = 0.000000228,
-            //                             Low = 0.000000219,
-            //                             Close = 0.000000224
-            //                         },
-            //                         Volume = 1800
-            //                     },
-            //                     new DEXTradeByTokens
-            //                     {
-            //                         Block = new Block { Timefield = DateTime.UtcNow.AddMinutes(-1) },
-            //                         Trade = new Trade
-            //                         {
-            //                             Open = 0.000000224,
-            //                             High = 0.000000230,
-            //                             Low = 0.000000223,
-            //                             Close = 0.000000226
-            //                         },
-            //                         Volume = 1700
-            //                     },
-            //                     new DEXTradeByTokens
-            //                     {
-            //                         Block = new Block { Timefield = DateTime.UtcNow },
-            //                         Trade = new Trade
-            //                         {
-            //                             Open = 0.000000226,
-            //                             High = 0.000000228,
-            //                             Low = 0.000000222,
-            //                             Close = 0.000000223
-            //                         },
-            //                         Volume = 1900
-            //                     }
-            //                 }
-            //             }
-            //         }
-            //     }
-            // };
-
-
-            // var ohlcvEntries = OhlcvBuilder.OhlcvModelBuilder(ohlcvDataList[0]);
-
-            // Load the data
             ChartData data = new()
                 {
-                 ChartEntries = new List<IChartEntry>(ohlcvEntries),
+                    ChartEntries = new List<IChartEntry>(ohlcvEntries = ohlcvEntries
+        .GroupBy(entry => entry.Time)
+        .Select(group => group.First())
+        .OrderBy(entry => entry.Time) // Ensure chronological order
+        .ToList()),
                     MarkerData = new List<Marker>()
                 };
 
@@ -138,11 +82,11 @@ Welcome to your new app.
             // Optionally define options
             ChartOptions options = new()
                 {
-                    
+
                     TimeScaleSecondsVisible = true,
                     Width = 800, // Fixed width for debugging
                     Height = 400 // Add a fixed height
-                    
+
                 };
 
             if (myChart != null)
@@ -151,6 +95,8 @@ Welcome to your new app.
                 await myChart.LoadChartAsync(data, options);
                 Console.WriteLine("Chart loaded successfully.");
             }
+
+            
         }
         catch (Exception ex)
         {

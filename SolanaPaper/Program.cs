@@ -12,7 +12,7 @@ builder.Services.Configure<MongoDBSettings>(builder.Configuration.GetSection("Mo
 builder.Services.Configure<SolanaSettings>(builder.Configuration.GetSection("Solana"));
 builder.Services.AddSingleton<UsersRepository>();
 builder.Services.AddSingleton<TokenRepository>();
-builder.Services.AddSingleton<MarketDataRepository>();
+builder.Services.AddSingleton<OhlcvRepository>();
 //builder.Services.AddSingleton<BitQueryService>();
 
 // Add services to the container.
