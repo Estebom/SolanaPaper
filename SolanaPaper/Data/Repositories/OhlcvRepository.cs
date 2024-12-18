@@ -38,7 +38,18 @@ namespace SolanaPaper.Data.Repositories
         {
             try
             {
-                await _OhlcvDataCollection.InsertOneAsync(ohlcv);
+                var existingTimes = await _OhlcvDataCollection.Find(x => x.ContactAddress == ohlcv.ContactAddress)
+                      .Project(x => x.Time).ToListAsync();
+
+                if (!existingTimes.Contains(ohlcv.Time)) 
+                {
+                    await _OhlcvDataCollection.InsertOneAsync(ohlcv);
+                }
+                else
+                {
+                    Console.WriteLine("No new data to insert.");
+                }
+
                 return;
             }
             catch (Exception e)
@@ -52,7 +63,7 @@ namespace SolanaPaper.Data.Repositories
         {
             try
             {
-                var existingTimes = await _OhlcvDataCollection.Find(_ => true)
+                var existingTimes = await _OhlcvDataCollection.Find(x => x.ContactAddress == ohlcvs[0].ContactAddress)
                     .Project(x => x.Time).ToListAsync();
 
                 var newOhlcvs = ohlcvs.Where(x => !existingTimes.Contains(x.Time)).ToList();

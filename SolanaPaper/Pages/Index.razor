@@ -20,6 +20,7 @@ Welcome to your new app.
 <TradingViewChart @ref=myChart />
 
 
+
 @code
 {
     [Inject]
@@ -27,12 +28,13 @@ Welcome to your new app.
 
     BitQueryService bitQueryService = new BitQueryService();
 
+
     TradingViewChart? myChart;
 
     string mintAddress = "EqFvmyocakvpTc14hYxdXDno81bLnUaQjwmpyHrLpump";
     string programID = "6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P";
-    string interval = "minutes";
-    string limit = "160";
+    string interval = "seconds";
+    string limit = "224";
     string count = "1";
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -43,50 +45,27 @@ Welcome to your new app.
         try
         {
             List<Ohlcv> ohlcvEntries = new List<Ohlcv>();
+            ChartService chartDataHelper = new ChartService(ohlcvRepository, bitQueryService);
+
             // query from mongo before bitquery
-            var ohlcvDTOs = await ohlcvRepository.GetByContactAddress(mintAddress);
-            ohlcvEntries.AddRange(OhlcvBuilder.OhlcvModelBuilder(ohlcvDTOs));
+            await chartDataHelper.GetMongoOhlcv(ohlcvEntries, mintAddress);
 
             if (ohlcvEntries.Count < Convert.ToInt32(limit))
             {
-                Console.WriteLine("Fetching from BitQuery...");
-                var ohlcv = await bitQueryService.GetOHLCV(mintAddress, programID, interval, (Convert.ToInt32(limit) - ohlcvEntries.Count).ToString(), "1");
-                var newOhlcvDTOs = OhlcvDTOBuilder.OhlcvModelBuilder(ohlcv, mintAddress);
-                await ohlcvRepository.Create(newOhlcvDTOs);
-                ohlcvEntries.AddRange(OhlcvBuilder.OhlcvModelBuilder(newOhlcvDTOs));
+                await chartDataHelper.GetBitQueryOhlcv(ohlcvEntries, mintAddress, programID, interval, (Convert.ToInt32(limit) - ohlcvEntries.Count).ToString(), count);
             }
-
-           
 
             ChartData data = new()
                 {
-                    ChartEntries = new List<IChartEntry>(ohlcvEntries = ohlcvEntries
-        .GroupBy(entry => entry.Time)
-        .Select(group => group.First())
-        .OrderBy(entry => entry.Time) // Ensure chronological order
-        .ToList()),
+                    ChartEntries = new List<IChartEntry>(chartDataHelper.RemoveDuplicates(ohlcvEntries)),
                     MarkerData = new List<Marker>()
                 };
 
-            Console.WriteLine(data.ChartEntries);
-
-            foreach (var entry in data.ChartEntries)
-            {
-                Console.WriteLine(entry.DisplayPrice);
-                Console.WriteLine($"Time: {entry.Time}, Price: {entry.DisplayPrice}");
-
-            }
-
-            Console.WriteLine(data.ChartEntries.Count);
-
-            // Optionally define options
             ChartOptions options = new()
                 {
-
                     TimeScaleSecondsVisible = true,
                     Width = 800, // Fixed width for debugging
                     Height = 400 // Add a fixed height
-
                 };
 
             if (myChart != null)

@@ -18,7 +18,7 @@ namespace SolanaPaper.Data.Models.ModelBuilders
                 ohlcvModel.Close = (decimal)transaction.Trade.Close;
                 ohlcvModel.Open = (decimal)transaction.Trade.Open;
                 ohlcvModel.High = (decimal)transaction.Trade.High;
-                ohlcvModel.Low = (decimal)transaction.Trade.Low;
+                ohlcvModel.Low =  (decimal)transaction.Trade.Low;
                 ohlcvModel.Volume = (decimal)transaction.Volume;
 
                 ohlcvModels.Add(ohlcvModel);
@@ -36,11 +36,11 @@ namespace SolanaPaper.Data.Models.ModelBuilders
             {
                 Ohlcv ohlcvModel = new Ohlcv();
                 ohlcvModel.Time = transaction.Time;
-                ohlcvModel.Close = transaction.Close;
-                ohlcvModel.Open = transaction.Open;
-                ohlcvModel.High = transaction.High;
-                ohlcvModel.Low = transaction.Low;
-                ohlcvModel.Volume = transaction.Volume;
+                ohlcvModel.Close = 1_000_000_000m * transaction.Close * 215;
+                ohlcvModel.Open = 1_000_000_000m * transaction.Open * 215;
+                ohlcvModel.High = 1_000_000_000m * transaction.High * 215;
+                ohlcvModel.Low = 1_000_000_000m * transaction.Low * 215;
+                ohlcvModel.Volume = transaction.Volume * transaction.Close * 215;
 
                 ohlcvModels.Add(ohlcvModel);
             }
