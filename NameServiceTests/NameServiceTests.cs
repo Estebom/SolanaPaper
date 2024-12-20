@@ -21,6 +21,8 @@ using SolanaPaper.Data.Models;
 using Newtonsoft.Json;
 using System.Text;
 using SolanaPaper.Services.Solana;
+using TradingView.Blazor.Models;
+using SolanaPaper.Data.Models.SolanaPaper.Data.Models;
 
 
 namespace NameServiceTests
@@ -99,13 +101,24 @@ namespace NameServiceTests
 
             BitQueryService bitQueryService = new BitQueryService();
 
-            OhlcvVM token = await bitQueryService.GetOHLCV("59dNifHEVjjyvDPqMm1HoNpffJVYwfciGHUrahpSpump", "6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P", "minutes", "1440", "1");
-            Console.WriteLine(token);
+            //OhlcvVM token = await bitQueryService.GetOHLCV("59dNifHEVjjyvDPqMm1HoNpffJVYwfciGHUrahpSpump", "6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P", "minutes", "1440", "1");
+            //Console.WriteLine(token);
 
-            foreach (DEXTradeByTokens trade in token.Data.Solana.DEXTradeByTokens)
+            //foreach (DEXTradeByTokens trade in token.Data.Solana.DEXTradeByTokens)
+            //{
+            //    Console.WriteLine(trade.Volume);
+            //}
+
+            List<LiveTokenPrice> ohlcvs = new List<LiveTokenPrice>();
+
+            await bitQueryService.StreamTokenPrice(ohlcvs);
+
+            foreach (LiveTokenPrice token in ohlcvs)
             {
-                Console.WriteLine(trade.Volume);
+                Console.WriteLine(token.Solana.DEXTradeByTokens.Count);
             }
+
+            //await bitQueryService.StreamTokenPrice(ohlcvs);
 
         }
     }

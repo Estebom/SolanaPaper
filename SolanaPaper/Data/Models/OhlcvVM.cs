@@ -40,6 +40,4 @@ namespace SolanaPaper.Data.Models
             public double Low { get; set; }
             public double Open { get; set; }
         }
-    
-
 }

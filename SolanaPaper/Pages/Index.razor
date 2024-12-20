@@ -1,5 +1,6 @@
 ﻿@page "/"
 @using SolanaPaper.Data.Models
+@using SolanaPaper.Data.Models.SolanaPaper.Data.Models
 @using SolanaPaper.Data.Repositories
 @using SolanaPaper.Services
 @using SolanaPaper.Services.Solana
@@ -28,13 +29,16 @@ Welcome to your new app.
 
     BitQueryService bitQueryService = new BitQueryService();
 
-
     TradingViewChart? myChart;
 
-    string mintAddress = "EqFvmyocakvpTc14hYxdXDno81bLnUaQjwmpyHrLpump";
+    List<Ohlcv> ohlcvEntries = new List<Ohlcv>();
+
+    // List<PricePoint> ohlcvs = new List<PricePoint>();
+
+
+    string mintAddress = "5uGZcRPBpF6veX9NGki1WvKLKNywbja7jd6u7hE5pump";
     string programID = "6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P";
     string interval = "seconds";
-    string limit = "224";
     string count = "1";
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -44,16 +48,27 @@ Welcome to your new app.
 
         try
         {
-            List<Ohlcv> ohlcvEntries = new List<Ohlcv>();
+            // await bitQueryService.StreamTokenPrice(ohlcvEntries);
+
+            // foreach (Ohlcv price in ohlcvEntries)
+            // {
+            //     Console.WriteLine(price.DisplayPrice);
+            //     Console.WriteLine(price.Volume);
+            //     Console.WriteLine(price.Time);
+            // }
+            // await bitQueryService.StreamTokenPrice(ohlcvEntries);
+
             ChartService chartDataHelper = new ChartService(ohlcvRepository, bitQueryService);
 
             // query from mongo before bitquery
             await chartDataHelper.GetMongoOhlcv(ohlcvEntries, mintAddress);
 
-            if (ohlcvEntries.Count < Convert.ToInt32(limit))
-            {
-                await chartDataHelper.GetBitQueryOhlcv(ohlcvEntries, mintAddress, programID, interval, (Convert.ToInt32(limit) - ohlcvEntries.Count).ToString(), count);
+            // if (ohlcvEntries.Count < Convert.ToInt32(limit))
+            // {
+            if (ohlcvEntries.Count == 0){
+                await chartDataHelper.GetBitQueryOhlcv(ohlcvEntries, mintAddress, programID, interval, count);
             }
+            // }
 
             ChartData data = new()
                 {

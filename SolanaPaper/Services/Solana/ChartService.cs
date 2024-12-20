@@ -30,11 +30,11 @@ namespace SolanaPaper.Services.Solana
             }
         }
 
-        public async Task GetBitQueryOhlcv(List<Ohlcv> entries, string mintAddress, string programId, string unitOfTime, string count, string counter)
+        public async Task GetBitQueryOhlcv(List<Ohlcv> entries, string mintAddress, string programId, string unitOfTime, string counter)
         {
             try
             {
-                var ohlcvVM = await _bitQueryService.GetOHLCV(mintAddress, programId, unitOfTime, count, counter);
+                var ohlcvVM = await _bitQueryService.GetOHLCV(mintAddress, programId, unitOfTime,  counter);
                 var newOhlcvDTOs = OhlcvDTOBuilder.OhlcvModelBuilder(ohlcvVM, mintAddress);
                 await _ohlcvRepository.Create(newOhlcvDTOs);
 

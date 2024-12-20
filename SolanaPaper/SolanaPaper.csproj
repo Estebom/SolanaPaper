@@ -8,6 +8,10 @@
 
   <ItemGroup>
     <PackageReference Include="CsvHelper" Version="33.0.1" />
+    <PackageReference Include="GraphQL.Client" Version="6.1.0" />
+    <PackageReference Include="GraphQL.Client.Abstractions" Version="6.1.0" />
+    <PackageReference Include="GraphQL.Client.Abstractions.Websocket" Version="6.1.0" />
+    <PackageReference Include="GraphQL.Client.Serializer.Newtonsoft" Version="6.1.0" />
     <PackageReference Include="MongoDB.Driver" Version="3.1.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="RestSharp" Version="112.1.0" />
@@ -15,6 +19,7 @@
     <PackageReference Include="Solnet.Rpc" Version="6.1.0" />
     <PackageReference Include="Solnet.Serum" Version="6.0.13" />
     <PackageReference Include="TradingView.Blazor" Version="2023.5.20.1603" />
+    <PackageReference Include="WebSocketSharp" Version="1.0.3-rc11" />
     <PackageReference Include="xunit.extensibility.core" Version="2.5.3" />
   </ItemGroup>
 
