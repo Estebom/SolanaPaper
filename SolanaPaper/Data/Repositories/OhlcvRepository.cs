@@ -25,7 +25,7 @@ namespace SolanaPaper.Data.Repositories
             try
             {
                 FilterDefinition<OhlcvDTO> filter = Builders<OhlcvDTO>.Filter.Eq("_ca", contractAddress);
-                return await _OhlcvDataCollection.Find(filter).ToListAsync();
+                return await _OhlcvDataCollection.Find(filter).SortBy(x => x.Time).ToListAsync();
             }
             catch (Exception e)
             {
@@ -63,14 +63,9 @@ namespace SolanaPaper.Data.Repositories
         {
             try
             {
-                var existingTimes = await _OhlcvDataCollection.Find(x => x.ContactAddress == ohlcvs[0].ContactAddress)
-                    .Project(x => x.Time).ToListAsync();
-
-                var newOhlcvs = ohlcvs.Where(x => !existingTimes.Contains(x.Time)).ToList();
-
-                if (newOhlcvs.Any())
+                if (ohlcvs.Any())
                 {
-                    await _OhlcvDataCollection.InsertManyAsync(newOhlcvs);
+                    await _OhlcvDataCollection.InsertManyAsync(ohlcvs);
                 }
                 else 
                 {

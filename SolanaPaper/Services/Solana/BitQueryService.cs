@@ -12,6 +12,8 @@ using System.Reactive.Disposables;
 using WebSocketSharp;
 using System.Net.WebSockets;
 using Newtonsoft.Json.Linq;
+using Solnet.Programs.Abstract;
+using System.Collections.ObjectModel;
 
 
 
@@ -27,42 +29,16 @@ namespace SolanaPaper.Services.Solana
             bitClient = new RestClient(new RestClientOptions("https://streaming.bitquery.io"));
         }
 
-        public async Task StreamTokenPrice(List<Ohlcv> ohlcvs)
+        public async Task StreamTokenPrice(ObservableCollection<Ohlcv> ohlcvs, string contactAddress, string programId)
         {
             try
             {
-                using (var client = new ClientWebSocket())
-                {
-                    client.Options.SetRequestHeader("Authorization", $"Bearer {BitQuerySettings.AccessToken}");
-                    client.Options.AddSubProtocol("graphql-ws");
-
-                    //client.Options.RemoteCertificateValidationCallback = (sender, certificate, chain, sslPolicyErrors) => true;
-                    var uri = new Uri($"wss://streaming.bitquery.io/eap");
-                    Console.WriteLine("Connecting to WebSocket...");
-                    await client.ConnectAsync(uri, CancellationToken.None);
-                    Console.WriteLine("Connected!");
-
-                    var connectionInitMessage = "{\"type\":\"connection_init\",\"payload\":{}}";
-                    await client.SendAsync(
-                        new ArraySegment<byte>(Encoding.UTF8.GetBytes(connectionInitMessage)),
-                        WebSocketMessageType.Text,
-                        true,
-                        CancellationToken.None
-                    );
-                    Console.WriteLine("Sent connection_init.");
-
-                    var queryMessage = new
-                    {
-                        id = "1",
-                        type = "start",
-                        payload = new
-                        {
-                            query = @"
+                string query = @"
                           subscription MyQuery {
                               Solana {
                                 DEXTradeByTokens(
                                   orderBy: {ascending: Block_Time}
-                                  where: {Trade: {Dex: {ProgramAddress: {is: ""6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P""}}, Currency: {MintAddress: {is: ""7a1tvjPAh5j47CL9fus9hjfY5RRgyKg5xmQJLJWSpump""}}}, Transaction: {Result: {Success: true}}}
+                                  where: {Trade: {Dex: {ProgramAddress: {is: ""{ProgramAddress}""}}, Currency: {MintAddress: {is: ""{MintAddress}""}}}, Transaction: {Result: {Success: true}}}
                                 ) {
                                   Block {
                                     Time
@@ -87,68 +63,30 @@ namespace SolanaPaper.Services.Solana
                                   volume: sum(of: Trade_Amount)
                                 }
                               }
-                            }",
-                            variables = new { }
-                        }
-                    };
+                            }";
+                StringBuilder sb = new StringBuilder(query);
+                sb.Replace("{MintAddress}", contactAddress);
+                sb.Replace("{ProgramAddress}", programId);
+                query = sb.ToString();
 
-                    var queryMessageJson = Newtonsoft.Json.JsonConvert.SerializeObject(queryMessage);
-                    await client.SendAsync(
-                        new ArraySegment<byte>(Encoding.UTF8.GetBytes(queryMessageJson)),
-                        WebSocketMessageType.Text,
-                        true,
-                        CancellationToken.None
-                    );
-                    Console.WriteLine("Sent query.");
+                var handler = new WebSocketHandler(ohlcvs);
+                var cts = new CancellationTokenSource();
 
+                var webSocketTask = handler.HandleWebSocket(query);
+                var emitTask = handler.StartEmitLoop();
 
-                    var receiveBuffer = new byte[1100];
-
-                    // Listen for messages
-                    var receiveTask = Task.Run(async () =>
+                var monitorTask = Task.Run(async() =>
+                {
+                    while (ohlcvs.Count < 300)
                     {
-                        while (client.State == System.Net.WebSockets.WebSocketState.Open)
-                        {
-                            var result = await client.ReceiveAsync(new ArraySegment<byte>(receiveBuffer), CancellationToken.None);
-                            var message = Encoding.UTF8.GetString(receiveBuffer, 0, result.Count);
-                            Console.WriteLine($"[WebSocket Message] {message}");
-
-                            //JObject parsedJson = JObject.Parse(message);
-
-                            //var trades = parsedJson["payload"]?["data"]?["Solana"]?["DEXTradeByTokens"];
-
-                            //if (trades != null) 
-                            //{
-                            //    foreach (var trade in trades) 
-                            //    {
-                            //        //ohlcvs.Insert(0, new PricePoint
-                            //        //{
-                            //        //    Time = trade["Block"]["Time"].Value<DateTime>(),
-                            //        //    Price = trade["Trade"]["Price"].Value<decimal>(),
-                            //        //    Volume = trade["volume"].Value<decimal>()
-                            //        //});
-                            //    }
-                            //}
-                        }
-                    });
-
-                    // Send messages
-                    while (true)
-                    {
-                        Console.Write("> ");
-                        var msg = Console.ReadLine();
-
-                        if (msg == "exit")
-                        {
-                            break;
-                        }
-
-                        var msgBuffer = Encoding.UTF8.GetBytes(msg);
-                        await client.SendAsync(new ArraySegment<byte>(msgBuffer), WebSocketMessageType.Text, true, CancellationToken.None);
+                        await Task.Delay(500);
                     }
+                    cts.Cancel();
+                });
+                await Task.WhenAny(monitorTask);
+                handler.StopWebSocket();
+                Console.WriteLine("Stopped WebSocket after reaching 5 entries.");
 
-                    await client.CloseAsync(WebSocketCloseStatus.NormalClosure, "Closed by client", CancellationToken.None);
-                }
             }
             catch (System.Net.WebSockets.WebSocketException wsEx)
             {
@@ -174,6 +112,42 @@ namespace SolanaPaper.Services.Solana
                 StringBuilder sb = new StringBuilder(body);
                 sb.Replace("{MintAddress}", contactAddress);
                 sb.Replace("{ProgramAddress}", programId);
+                sb.Replace("{unitOfTime}", unitOfTime);
+                sb.Replace("{counter}", counter);
+                body = sb.ToString();
+
+                request.AddStringBody(body, DataFormat.Json);
+
+                RestResponse response = await bitClient.ExecuteAsync(request);
+
+                if (response.IsSuccessful)
+                {
+                    return JsonConvert.DeserializeObject<OhlcvVM>(response.Content);
+                }
+                else
+                {
+                    Console.WriteLine("Response content is null");
+                    return null;
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
+        }
+
+        public async Task<OhlcvVM> GetOHLCV(string contactAddress, DateTime after, string programId = "6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P", string unitOfTime = "minutes", string counter = "1")
+        {
+            try
+            {
+                var request = new RestRequest("/eap", Method.Post);
+                request.AddHeader("Content-Type", "application/json");
+                request.AddHeader("Authorization", $"Bearer {BitQuerySettings.AccessToken}\t");
+                var body = @"{""query"":""{\n  Solana {\n    DEXTradeByTokens(\n      orderBy: {ascendingByField: \""Block_Timefield\""}\n      where: {Trade: {Currency: {MintAddress: {is: \""{MintAddress}\""}}, Dex: {ProgramAddress: {is: \""{ProgramAddress}\""}}, PriceAsymmetry: {lt: 0.1}}, Block: {Time: {after: \""{Time}\""}}}\n    ) {\n      Block {\n        Timefield: Time(interval: {in: {unitOfTime}, count: {counter}})\n      }\n      volume: sum(of: Trade_Amount)\n      Trade {\n        high: Price(maximum: Trade_Price)\n        low: Price(minimum: Trade_Price)\n        open: Price(minimum: Block_Slot)\n        close: Price(maximum: Block_Slot)\n      }\n      count\n    }\n  }\n}\n"",""variables"":""{}""}"; StringBuilder sb = new StringBuilder(body);
+                sb.Replace("{MintAddress}", contactAddress);
+                sb.Replace("{ProgramAddress}", programId);
+                sb.Replace("{Time}", after.ToString("yyyy-MM-ddTHH:mm:ssZ"));
                 sb.Replace("{unitOfTime}", unitOfTime);
                 sb.Replace("{counter}", counter);
                 body = sb.ToString();

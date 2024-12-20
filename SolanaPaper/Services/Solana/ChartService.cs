@@ -48,13 +48,27 @@ namespace SolanaPaper.Services.Solana
             }
         }
 
-        public List<Ohlcv> RemoveDuplicates(List<Ohlcv> entries)
+        public async Task GetBitQueryOhlcv(List<Ohlcv> entries, DateTime after, string mintAddress, string programId, string unitOfTime, string counter)
         {
-            return entries
-                    .GroupBy(entry => entry.Time)
-                    .Select(group => group.First())
-                    .OrderBy(entry => entry.Time) 
-                    .ToList();
+            try
+            {
+                var ohlcvVM = await _bitQueryService.GetOHLCV(mintAddress, after, programId, unitOfTime, counter);
+                var newOhlcvDTOs = OhlcvDTOBuilder.OhlcvModelBuilder(ohlcvVM, mintAddress);
+                await _ohlcvRepository.Create(newOhlcvDTOs);
+
+                entries.AddRange(OhlcvBuilder.OhlcvModelBuilder(newOhlcvDTOs));
+                return;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
+        }
+
+        public List<Ohlcv> OrderByTime(List<Ohlcv> entries)
+        {
+            return entries.OrderBy(entries => entries.Time).ToList();
         }
 
         public List<PricePoint> GetPricePoints(List<Ohlcv> entries)

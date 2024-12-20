@@ -5,6 +5,7 @@
 @using SolanaPaper.Services
 @using SolanaPaper.Services.Solana
 @using SolanaPaper.Data.Models.ModelBuilders;
+@using System.Collections.ObjectModel
 @using TradingView.Blazor;
 @using TradingView.Blazor.Models
 @using System.Net;
@@ -31,76 +32,104 @@ Welcome to your new app.
 
     TradingViewChart? myChart;
 
+    ObservableCollection<Ohlcv> ohlcvs;
     List<Ohlcv> ohlcvEntries = new List<Ohlcv>();
 
     // List<PricePoint> ohlcvs = new List<PricePoint>();
 
 
-    string mintAddress = "5uGZcRPBpF6veX9NGki1WvKLKNywbja7jd6u7hE5pump";
+    string mintAddress = "EGk1hoDKspQK1quFdRgyMRFz6AQK9E6a6CurVEsKpump";
     string programID = "6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P";
     string interval = "seconds";
     string count = "1";
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (!firstRender)
-            return;
 
-        try
+        if (firstRender)
         {
-            // await bitQueryService.StreamTokenPrice(ohlcvEntries);
+            try
+            {
+                ChartService chartDataHelper = new ChartService(ohlcvRepository, bitQueryService);
 
-            // foreach (Ohlcv price in ohlcvEntries)
-            // {
-            //     Console.WriteLine(price.DisplayPrice);
-            //     Console.WriteLine(price.Volume);
-            //     Console.WriteLine(price.Time);
-            // }
-            // await bitQueryService.StreamTokenPrice(ohlcvEntries);
+                // query from mongo before bitquery
+                await chartDataHelper.GetMongoOhlcv(ohlcvEntries, mintAddress);
 
-            ChartService chartDataHelper = new ChartService(ohlcvRepository, bitQueryService);
 
-            // query from mongo before bitquery
-            await chartDataHelper.GetMongoOhlcv(ohlcvEntries, mintAddress);
-
-            // if (ohlcvEntries.Count < Convert.ToInt32(limit))
-            // {
-            if (ohlcvEntries.Count == 0){
-                await chartDataHelper.GetBitQueryOhlcv(ohlcvEntries, mintAddress, programID, interval, count);
-            }
-            // }
-
-            ChartData data = new()
+                if (!ohlcvEntries.Any())
                 {
-                    ChartEntries = new List<IChartEntry>(chartDataHelper.RemoveDuplicates(ohlcvEntries)),
+                    await chartDataHelper.GetBitQueryOhlcv(ohlcvEntries, mintAddress, programID, interval, count);
+                }
+                else 
+                {
+                    await chartDataHelper.GetBitQueryOhlcv(ohlcvEntries, ohlcvEntries.Last().Time, mintAddress, programID, interval, count);
+                }
+
+                ohlcvs = new ObservableCollection<Ohlcv>(chartDataHelper.OrderByTime(ohlcvEntries));
+
+                ChartData data = new()
+                    {
+                        ChartEntries = new List<IChartEntry>(ohlcvs),
+                        MarkerData = new List<Marker>()
+                    };
+
+                ChartOptions options = new()
+                    {
+                        TimeScaleSecondsVisible = true,
+                        Width = 800, // Fixed width for debugging
+                        Height = 400 // Add a fixed height
+                    };
+                   
+                ///TODO : TRY TO LOAD THE GRPAH ITERATIVELY MAYBE IT WILL GO SECOND BY SECOND.
+
+                if (myChart != null)
+                {
+                    Console.WriteLine("Loading chart...");
+                    await myChart.LoadChartAsync(data, options);
+                    Console.WriteLine("Chart loaded successfully.");
+                }
+
+                ohlcvs.CollectionChanged += OnOhcvCollectionChanged;
+
+                try 
+                {
+                    await bitQueryService.StreamTokenPrice(ohlcvs, mintAddress, programID);
+
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error: {ex.Message}");
+                }
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error loading chart: {ex.Message}");
+            }
+        }
+    }
+
+    public async void OnOhcvCollectionChanged(object sender, EventArgs e)
+    {
+        Console.WriteLine("OHLCV collection changed!");
+        await UpdateChartAsync();
+    }
+
+    public async Task UpdateChartAsync()
+    {
+        if (myChart != null)
+        {
+            ChartData updatedChartData = new()
+                {
+                    ChartEntries = new List<IChartEntry>(ohlcvs),
                     MarkerData = new List<Marker>()
                 };
-
-            ChartOptions options = new()
-                {
-                    TimeScaleSecondsVisible = true,
-                    Width = 800, // Fixed width for debugging
-                    Height = 400 // Add a fixed height
-                };
-
-            if (myChart != null)
-            {
-                Console.WriteLine("Loading chart...");
-                await myChart.LoadChartAsync(data, options);
-                Console.WriteLine("Chart loaded successfully.");
-            }
-
-            
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error loading chart: {ex.Message}");
+            await myChart.UpdateChartAsync(updatedChartData);
         }
     }
 
-    public async Task UpdateChart(ChartData updatedChartData)
+    protected override async Task OnInitializedAsync()
     {
-        await myChart.UpdateChartAsync(updatedChartData);
+        // ohlcvEntries = new List<Ohlcv>();
     }
-
 }
