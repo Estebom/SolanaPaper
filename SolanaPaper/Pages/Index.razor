@@ -38,9 +38,9 @@ Welcome to your new app.
     // List<PricePoint> ohlcvs = new List<PricePoint>();
 
 
-    string mintAddress = "EGk1hoDKspQK1quFdRgyMRFz6AQK9E6a6CurVEsKpump";
+    string mintAddress = "4er1XqvoyL6tLesUpbMTXDJkqhrZxmBSwCetWSWspump";
     string programID = "6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P";
-    string interval = "seconds";
+    string interval = "minutes";
     string count = "1";
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -65,8 +65,11 @@ Welcome to your new app.
                     await chartDataHelper.GetBitQueryOhlcv(ohlcvEntries, ohlcvEntries.Last().Time, mintAddress, programID, interval, count);
                 }
 
+                // ohlcvs = new ObservableCollection<Ohlcv>(chartDataHelper.OrderByTime(ohlcvEntries));
+
                 ohlcvs = new ObservableCollection<Ohlcv>(chartDataHelper.OrderByTime(ohlcvEntries));
 
+                // ohlcvs.Add(ohlcvEntries.First());
                 ChartData data = new()
                     {
                         ChartEntries = new List<IChartEntry>(ohlcvs),
@@ -90,6 +93,11 @@ Welcome to your new app.
                 }
 
                 ohlcvs.CollectionChanged += OnOhcvCollectionChanged;
+
+                // foreach (Ohlcv ohlcv in ohlcvEntries)
+                // {
+                //     ohlcvs.Add(ohlcv);
+                // }
 
                 try 
                 {

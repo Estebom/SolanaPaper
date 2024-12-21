@@ -132,7 +132,7 @@
 
         private void AggregateTradeData(DateTime tradeTime, decimal tradePrice, decimal tradeVolume)
         {
-            var intervalStart = new DateTime(tradeTime.Year, tradeTime.Month, tradeTime.Day, tradeTime.Hour, tradeTime.Minute, tradeTime.Second, 0);
+            var intervalStart = new DateTime(tradeTime.Year, tradeTime.Month, tradeTime.Day, tradeTime.Hour, tradeTime.Minute, 0);
 
             if (!ohlcvData.ContainsKey(intervalStart))
             {
@@ -163,7 +163,7 @@
 
             foreach (var ohlcv in ohlcvData)
             {
-                if (ohlcv.Key.AddSeconds(1) <= now)
+                if (ohlcv.Key.AddMinutes(1) <= now)
                 {
                     var candle = ohlcv.Value;
                     Console.WriteLine($"Candle: {candle.Time}, Open: {candle.Open}, High: {candle.High}, Low: {candle.Low}, Close: {candle.Close}, Volume: {candle.Volume}");

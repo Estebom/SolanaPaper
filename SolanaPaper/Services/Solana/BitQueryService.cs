@@ -101,7 +101,7 @@ namespace SolanaPaper.Services.Solana
                 Console.WriteLine($"General Error: {ex.Message}");
             }
         }
-        public async Task<OhlcvVM> GetOHLCV(string contactAddress, string programId= "6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P", string unitOfTime="minutes", string counter="1")
+        public async Task<OhlcvVM> GetOHLCV(string contactAddress, string programId= "6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P", string unitOfTime="seconds", string counter="1")
         {
             try
             {
@@ -137,7 +137,7 @@ namespace SolanaPaper.Services.Solana
             }
         }
 
-        public async Task<OhlcvVM> GetOHLCV(string contactAddress, DateTime after, string programId = "6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P", string unitOfTime = "minutes", string counter = "1")
+        public async Task<OhlcvVM> GetOHLCV(string contactAddress, DateTime after, string programId = "6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P", string unitOfTime = "seconds", string counter = "1")
         {
             try
             {
